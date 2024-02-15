@@ -1,0 +1,2505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SignalGenerator</class>
+ <widget class="QMainWindow" name="SignalGenerator">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>832</width>
+    <height>721</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SignalGenerator</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="SignalTypesTab">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>50</y>
+      <width>751</width>
+      <height>281</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="SignalTabTriangle">
+     <attribute name="title">
+      <string>Triangle</string>
+     </attribute>
+     <widget class="QLabel" name="TriangleTPerLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>T [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TriangleTRiseLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_rise [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TriangleTRiseEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TriangleTFallLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_fall [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TriangleTFallEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TriangleTPerEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TriangleYMaxEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TriangleYMaxLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>max (-1..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TriangleYMinLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>min [-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TriangleYMinEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TriangleTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>120</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TriangleTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>120</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabRectangle">
+     <attribute name="title">
+      <string>Rectangle</string>
+     </attribute>
+     <widget class="QLineEdit" name="RectangleTPerEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RectangleTPerLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>T [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RectangleFillFactorLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>fill factor [0..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RectangleFillFactorEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RectangleYMaxLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>max (-1..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RectangleYMaxEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RectangleYMinEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RectangleYMinLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>min [-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RectangleTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RectangleTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabPulse">
+     <attribute name="title">
+      <string>Pulse</string>
+     </attribute>
+     <widget class="QLineEdit" name="PulseTPerEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="PulseYMaxLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>max (-1..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="PulseYMaxEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="PulseTPerLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>T [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="PulseYMinLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>min [-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="PulseYMinEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="PulseTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>150</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="PulseTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>150</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="PulseTRiseEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="PulseTRiseLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_rise [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="PulseTFallLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>120</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_fall [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="PulseTFallEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>120</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="PulseTWidthLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_width [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="PulseTWidthEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabRiseFall">
+     <attribute name="title">
+      <string>RiseFall</string>
+     </attribute>
+     <widget class="QLabel" name="RiseFallYMaxLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>max (-1..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RiseFallYMinEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RiseFallYMaxEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RiseFallYMinLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>min [-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RiseFallTDelayRiseEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RiseFallTDelayRiseLabel">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>60</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay_rise [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RiseFallTRampRiseLabel">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_ramp_rise [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RiseFallTRampRiseEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RiseFallTDelayFallEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>120</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RiseFallTRampFallEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>150</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RiseFallTRampFallLabel">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>150</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_ramp_fall [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RiseFallTDelayFallLabel">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>120</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay_fall [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RiseFallTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RiseFallTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabSinDamp">
+     <attribute name="title">
+      <string>SinDamp</string>
+     </attribute>
+     <widget class="QLabel" name="SinDampAmplitLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>amplitude (0..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampPhiLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>φ [deg] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampFreqEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampPhiEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampFreqLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>f [Hz] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampOffsetLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>offset (-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampAmplitEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampOffsetEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampDampingLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>90</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>damping ( ≥0 ) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampDampingEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabSinRise">
+     <attribute name="title">
+      <string>SinRise</string>
+     </attribute>
+     <widget class="QLabel" name="SinRisePhiLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>φ [deg] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinRiseTEndEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinRiseDampingLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>90</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>damping ( ≥0 ) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinRiseFreqEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinRisePhiEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinRiseFreqLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>f [Hz] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinRiseOffsetLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>offset (-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinRiseAmplitLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>amplitude (0..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinRiseDampingEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinRiseAmplitEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinRiseTEndLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_end [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinRiseOffsetEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinRiseTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>120</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinRiseTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>120</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabWavSin">
+     <attribute name="title">
+      <string>WavSin</string>
+     </attribute>
+     <widget class="QLabel" name="WavSinPhiLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>φ [deg] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WavSinTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WavSinFreqEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WavSinPhiEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="WavSinFreqLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>f [Hz] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="WavSinOffsetLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>offset (-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="WavSinAmplitLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>amplitude (0..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WavSinAmplitEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="WavSinTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WavSinOffsetEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="WavSinNOrderLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>90</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>N =</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="WavSinNOrderSpin">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>90</y>
+        <width>51</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSpinBox:focus{ background-color: rgb(127, 255, 127) } 
+QSpinBox{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+      <property name="minimum">
+       <number>3</number>
+      </property>
+      <property name="singleStep">
+       <number>2</number>
+      </property>
+      <property name="value">
+       <number>19</number>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabAmSin">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <attribute name="title">
+      <string>AmSin</string>
+     </attribute>
+     <widget class="QGroupBox" name="AmSinCarrierGroupBox">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>231</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Carrier</string>
+      </property>
+      <widget class="QLineEdit" name="AmSinCarrierAmplitEdit">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>60</y>
+         <width>81</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="AmSinCarrierAmplitLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>60</y>
+         <width>101</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>amplitude (0..1] =</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="AmSinCarrierFreqEdit">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>30</y>
+         <width>81</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="AmSinCarrierFreqLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>f [Hz] =</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="AmSinCarrierOffsetLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>90</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>offset (-1..1) =</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="AmSinCarrierOffsetEdit">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>90</y>
+         <width>81</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="AmSinCarrierTDelayEdit">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>120</y>
+         <width>81</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="AmSinCarrierTDelayLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>120</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>t_delay [s] =</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="AmSinModulationGroupBox">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>10</y>
+        <width>211</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Modulation</string>
+      </property>
+      <widget class="QLabel" name="AmSinModFreqLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>f [Hz] =</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="AmSinModFreqEdit">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>30</y>
+         <width>81</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="AmSinModPhiLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>60</y>
+         <width>61</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>φ [deg] =</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="AmSinModPhiEdit">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>60</y>
+         <width>81</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="AmSinModModLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>90</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>m =</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="AmSinModModEdit">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>90</y>
+         <width>81</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabSinDampSin">
+     <attribute name="title">
+      <string>SinDampSin</string>
+     </attribute>
+     <widget class="QLineEdit" name="SinDampSinAmplitEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampSinAmplitLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>amplitude (0..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampSinOffsetEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampSinOffsetLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>offset (-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampSinTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampSinTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampSinTEnvLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>T_env [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampSinTEnvEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="SinDampSinFreqSinEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampSinFreqSinLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>f_sin [Hz] =</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="SinDampSinDampingTypeSpin">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSpinBox:focus{ background-color: rgb(127, 255, 127) } 
+QSpinBox{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+      <property name="minimum">
+       <number>-3</number>
+      </property>
+      <property name="maximum">
+       <number>3</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SinDampSinDampingTypeLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>90</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>damping type =</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabTrapDampSin">
+     <attribute name="title">
+      <string>TrapDampSin</string>
+     </attribute>
+     <widget class="QLabel" name="TrapDampSinTWidthLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_width [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinTFallLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>120</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_fall [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>150</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>150</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinTFallEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>120</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinTPerLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>T [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinTWidthEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinTRiseEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinTPerEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinTRiseLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_rise [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinOffsetLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>offset (-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinAmplitLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>141</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>amplitude @ t=0 (0..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinAmplitEdit">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinOffsetEdit">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinFreqEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>210</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinFreqLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>210</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>f [Hz] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TrapDampSinTCrossEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>180</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="TrapDampSinTCrossLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>180</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_cross [s] =</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SignalTabNoise">
+     <attribute name="title">
+      <string>Noise</string>
+     </attribute>
+     <widget class="QLineEdit" name="NoiseTDelayEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>90</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="NoiseOffsetLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>60</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>offset (-1..1) =</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="NoiseAmplitLabel">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>30</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>amplitude (0..1] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="NoiseAmplitEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="NoiseTDelayLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>t_delay [s] =</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="NoiseOffsetEdit">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit:focus{ background-color: rgb(127, 255, 127) } 
+QLineEdit{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="NoiseTypeComboBox">
+      <property name="geometry">
+       <rect>
+        <x>108</x>
+        <y>30</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>DEK</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>NAG</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="NoiseTypeLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Type</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="NoiseGammaSpin">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>60</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSpinBox:focus{ background-color: rgb(127, 255, 127) } 
+QSpinBox{ background-color: rgb(255, 255, 255) }</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="minimum">
+       <double>-2.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>2.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="NoiseGammaLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>49</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>g =</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="GenerateGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>560</y>
+      <width>761</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Generate</string>
+    </property>
+    <widget class="QPushButton" name="GenerateStartButton">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>30</y>
+       <width>61</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="GeneratePauseButton">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>30</y>
+       <width>61</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pause</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="GenerateStopButton">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>30</y>
+       <width>61</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="GenerateDeviceComboBox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>331</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="BufferLengthLabel">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>70</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Buffer length [s] =</string>
+     </property>
+    </widget>
+    <widget class="QProgressBar" name="BufferProgressBar">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>70</y>
+       <width>281</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="BufferLengthSpin">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>70</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::UpDownArrows</enum>
+     </property>
+     <property name="minimum">
+      <number>2</number>
+     </property>
+     <property name="maximum">
+      <number>3600</number>
+     </property>
+     <property name="value">
+      <number>30</number>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="ActiveSignalGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>390</y>
+      <width>591</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Active signal</string>
+    </property>
+    <widget class="QPushButton" name="ActiveSignalEditButton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Edit</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="ActiveSignalSaveButton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+    <widget class="QListView" name="ActiveSignalList">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>30</y>
+       <width>451</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="ActiveSignalRemoveButton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="SignalItemGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>791</width>
+      <height>371</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Signal item</string>
+    </property>
+    <widget class="QPushButton" name="SignalItemActionButton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>330</y>
+       <width>191</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add to active signal</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="ExitButton">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>520</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Exit</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="GenerateVolumeSlider">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>460</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="sliderPosition">
+     <number>99</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="invertedControls">
+     <bool>false</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="tickInterval">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="VolumeLabel">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>430</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>VOL</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="GenerateVolumeLabel">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>430</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>xxx %</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <zorder>SignalItemGroupBox</zorder>
+   <zorder>ActiveSignalGroupBox</zorder>
+   <zorder>SignalTypesTab</zorder>
+   <zorder>GenerateGroupBox</zorder>
+   <zorder>ExitButton</zorder>
+   <zorder>GenerateVolumeSlider</zorder>
+   <zorder>VolumeLabel</zorder>
+   <zorder>GenerateVolumeLabel</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>832</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuSignal">
+    <property name="title">
+     <string>Signal</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionNew"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuSignal"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>SignalTypesTab</tabstop>
+  <tabstop>TriangleTPerEdit</tabstop>
+  <tabstop>TriangleTRiseEdit</tabstop>
+  <tabstop>TriangleTFallEdit</tabstop>
+  <tabstop>TriangleTDelayEdit</tabstop>
+  <tabstop>TriangleYMaxEdit</tabstop>
+  <tabstop>TriangleYMinEdit</tabstop>
+  <tabstop>RectangleTPerEdit</tabstop>
+  <tabstop>RectangleFillFactorEdit</tabstop>
+  <tabstop>RectangleTDelayEdit</tabstop>
+  <tabstop>RectangleYMaxEdit</tabstop>
+  <tabstop>RectangleYMinEdit</tabstop>
+  <tabstop>PulseTPerEdit</tabstop>
+  <tabstop>PulseTRiseEdit</tabstop>
+  <tabstop>PulseTWidthEdit</tabstop>
+  <tabstop>PulseTFallEdit</tabstop>
+  <tabstop>PulseTDelayEdit</tabstop>
+  <tabstop>PulseYMaxEdit</tabstop>
+  <tabstop>PulseYMinEdit</tabstop>
+  <tabstop>RiseFallTDelayEdit</tabstop>
+  <tabstop>RiseFallTDelayRiseEdit</tabstop>
+  <tabstop>RiseFallTRampRiseEdit</tabstop>
+  <tabstop>RiseFallTDelayFallEdit</tabstop>
+  <tabstop>RiseFallTRampFallEdit</tabstop>
+  <tabstop>RiseFallYMaxEdit</tabstop>
+  <tabstop>SinDampFreqEdit</tabstop>
+  <tabstop>RiseFallYMinEdit</tabstop>
+  <tabstop>SinDampPhiEdit</tabstop>
+  <tabstop>SinDampTDelayEdit</tabstop>
+  <tabstop>SinDampAmplitEdit</tabstop>
+  <tabstop>SinDampOffsetEdit</tabstop>
+  <tabstop>SinDampDampingEdit</tabstop>
+  <tabstop>SinRiseFreqEdit</tabstop>
+  <tabstop>SinRisePhiEdit</tabstop>
+  <tabstop>SinRiseTEndEdit</tabstop>
+  <tabstop>SinRiseTDelayEdit</tabstop>
+  <tabstop>SinRiseAmplitEdit</tabstop>
+  <tabstop>SinRiseOffsetEdit</tabstop>
+  <tabstop>SinRiseDampingEdit</tabstop>
+  <tabstop>WavSinFreqEdit</tabstop>
+  <tabstop>WavSinPhiEdit</tabstop>
+  <tabstop>WavSinTDelayEdit</tabstop>
+  <tabstop>WavSinAmplitEdit</tabstop>
+  <tabstop>WavSinOffsetEdit</tabstop>
+  <tabstop>WavSinNOrderSpin</tabstop>
+  <tabstop>AmSinCarrierFreqEdit</tabstop>
+  <tabstop>AmSinCarrierAmplitEdit</tabstop>
+  <tabstop>AmSinCarrierOffsetEdit</tabstop>
+  <tabstop>AmSinCarrierTDelayEdit</tabstop>
+  <tabstop>AmSinModFreqEdit</tabstop>
+  <tabstop>AmSinModPhiEdit</tabstop>
+  <tabstop>AmSinModModEdit</tabstop>
+  <tabstop>SinDampSinFreqSinEdit</tabstop>
+  <tabstop>SinDampSinTEnvEdit</tabstop>
+  <tabstop>SinDampSinTDelayEdit</tabstop>
+  <tabstop>SinDampSinAmplitEdit</tabstop>
+  <tabstop>SinDampSinOffsetEdit</tabstop>
+  <tabstop>SinDampSinDampingTypeSpin</tabstop>
+  <tabstop>TrapDampSinTPerEdit</tabstop>
+  <tabstop>TrapDampSinTRiseEdit</tabstop>
+  <tabstop>TrapDampSinTWidthEdit</tabstop>
+  <tabstop>TrapDampSinTFallEdit</tabstop>
+  <tabstop>TrapDampSinTDelayEdit</tabstop>
+  <tabstop>TrapDampSinTCrossEdit</tabstop>
+  <tabstop>TrapDampSinFreqEdit</tabstop>
+  <tabstop>TrapDampSinAmplitEdit</tabstop>
+  <tabstop>TrapDampSinOffsetEdit</tabstop>
+  <tabstop>NoiseTypeComboBox</tabstop>
+  <tabstop>NoiseTDelayEdit</tabstop>
+  <tabstop>NoiseAmplitEdit</tabstop>
+  <tabstop>NoiseOffsetEdit</tabstop>
+  <tabstop>SignalItemActionButton</tabstop>
+  <tabstop>ActiveSignalEditButton</tabstop>
+  <tabstop>ActiveSignalSaveButton</tabstop>
+  <tabstop>ActiveSignalRemoveButton</tabstop>
+  <tabstop>ActiveSignalList</tabstop>
+  <tabstop>GenerateDeviceComboBox</tabstop>
+  <tabstop>BufferLengthSpin</tabstop>
+  <tabstop>GenerateStartButton</tabstop>
+  <tabstop>GeneratePauseButton</tabstop>
+  <tabstop>GenerateStopButton</tabstop>
+  <tabstop>GenerateVolumeSlider</tabstop>
+  <tabstop>ExitButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
