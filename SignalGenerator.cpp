@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2023 Mihai Ursu                                                 //
+// Copyright (C) 2023,2025 Mihai Ursu                                            //
 //                                                                               //
 // This program is free software; you can redistribute it and/or modify          //
 // it under the terms of the GNU General Public License as published by          //
@@ -24,10 +24,14 @@ This file contains the sources for the signal generator.
 #include "./ui_SignalGenerator.h"
 
 #include <QFileDialog>
+#include <QTabBar>
 
 #include <algorithm>
+#include <cctype>
+#include <cmath>
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 
 #include "NoisePwrSpectrum.h"
 
@@ -46,8 +50,10 @@ SignalGenerator::SignalGenerator
     , mSignalReady( false )
     , mSignalStarted( false )
     , mSignalPaused( false )
+    , mSignalIsSmc( false )
     , mEditedSignal( nullptr )
     , mIsSignalEdited( false )
+    , mDevices( new QMediaDevices( this ) )
     , mAudioBufferLength( 30 )
     , mAudioBufferProgress( 0 )
     , mAudioBufferTimer( new QTimer( this ) )
@@ -61,11 +67,16 @@ SignalGenerator::SignalGenerator
     //****************************************
     // signals tabs
     //****************************************
-    mCurrentSignalType = SignalItem::SIGNAL_TYPE_FIRST + mMainUi->SignalTypesTab->currentIndex();
-
-    mMainUi->SignalTypesTab->setStyleSheet( "background-color: rgb(240, 240, 240)" );
     createTabSignalsMap();
     connect( mMainUi->SignalTypesTab, &QTabWidget::currentChanged, this, &SignalGenerator::handleSignalTypeChanged );
+
+    QTabBar* tabBar = mMainUi->SignalTypesTab->tabBar();
+    tabBar->setStyleSheet( "QTabBar::tab::selected { background-color: rgb(250, 250, 150) }" );
+
+    mCurrentSignalType = SignalItem::SIGNAL_TYPE_TRIANGLE;
+    int crtTab = mCurrentSignalType - SignalItem::SIGNAL_TYPE_FIRST;
+    mMainUi->SignalTypesTab->setCurrentIndex( crtTab );
+    handleSignalTypeChanged();
 
 
     // Triangle
@@ -167,6 +178,9 @@ SignalGenerator::SignalGenerator
     fillValuesNoise();
     connect( mMainUi->NoiseTypeComboBox, SIGNAL( currentIndexChanged(int) ), this, SLOT( handleSignalChangedNoiseType(int) ) );
 
+    // SMC
+    // nothing to do
+
     mMainUi->NoiseGammaLabel->setText( GAMMA_SMALL + " =" );
     connect( mMainUi->NoiseGammaSpin, SIGNAL( valueChanged(double) ), this, SLOT( handleSignalChangedNoiseGamma(double) ) );
 
@@ -195,29 +209,30 @@ SignalGenerator::SignalGenerator
     //****************************************
     // Generate
     //****************************************
-    const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
-    mMainUi->GenerateDeviceComboBox->addItem( defaultDeviceInfo.deviceName(), QVariant::fromValue( defaultDeviceInfo ) );
+    const QAudioDevice& defaultDeviceInfo = mDevices->defaultAudioOutput();
+    mMainUi->GenerateDeviceComboBox->addItem( defaultDeviceInfo.description(), QVariant::fromValue( defaultDeviceInfo ) );
 
-    for( auto &deviceInfo: QAudioDeviceInfo::availableDevices( QAudio::AudioOutput ) )
+    for( auto &deviceInfo: mDevices->audioOutputs() )
     {
         if( deviceInfo != defaultDeviceInfo )
         {
-             mMainUi->GenerateDeviceComboBox->addItem( deviceInfo.deviceName(), QVariant::fromValue( deviceInfo ) );
+             mMainUi->GenerateDeviceComboBox->addItem( deviceInfo.description(), QVariant::fromValue( deviceInfo ) );
         }
     }
 
-    connect( mMainUi->GenerateDeviceComboBox, QOverload<int>::of( &QComboBox::activated ), this, &SignalGenerator::handleDeviceChanged );
+    connect( mMainUi->GenerateDeviceComboBox, &QComboBox::currentIndexChanged, this, &SignalGenerator::handleDeviceChanged );
+    connect( mDevices, &QMediaDevices::audioOutputsChanged, this, &SignalGenerator::updateAudioDevices );
 
-    mMainUi->BufferLengthSpin->setRange( 2, 3600 );
+    mMainUi->BufferLengthSpin->setRange( 2, 300 );
     mMainUi->BufferLengthSpin->setValue( mAudioBufferLength );
-    connect( mMainUi->BufferLengthSpin, SIGNAL( valueChanged(int) ), this, SLOT( handleAudioBufferLengthChanged(int) ) );
+    connect( mMainUi->BufferLengthSpin, SIGNAL( valueChanged(double) ), this, SLOT( handleAudioBufferLengthChanged(double) ) );
 
     mMainUi->BufferProgressBar->setRange( 0, 100 );
     mMainUi->BufferProgressBar->setValue( mAudioBufferProgress );
 
     connect( mAudioBufferTimer, SIGNAL( timeout() ), this, SLOT( updateAudioBufferTimer() ) );
 
-    if( !initializeAudio( QAudioDeviceInfo::defaultOutputDevice() ) )
+    if( !initializeAudio( mDevices->defaultAudioOutput() ) )
     {
         QMessageBox::warning( this,
                               "SignalGenerator",
@@ -240,6 +255,8 @@ SignalGenerator::SignalGenerator
     connect( mMainUi->actionOpen, &QAction::triggered, this, &SignalGenerator::handleSignalOpen );
     connect( mMainUi->actionExit, &QAction::triggered, this, &SignalGenerator::handleExit );
 
+    connect( mMainUi->actionSmcOpen, &QAction::triggered, this, &SignalGenerator::handleSmcOpen );
+
     connect( mMainUi->actionAbout, &QAction::triggered, this, &SignalGenerator::handleAbout );
 
 #ifdef __unix__
@@ -259,6 +276,34 @@ SignalGenerator::SignalGenerator
 SignalGenerator::~SignalGenerator()
 {
     delete mMainUi;
+}
+
+
+//!************************************************************************
+//! Check if an integer value is valid
+//!
+//! @returns: true if valid
+//!************************************************************************
+bool SignalGenerator::checkValidInteger
+    (
+    const int16_t aIntValue         //!< integer value
+    ) const
+{
+    return ( aIntValue != mSmc.mNoValueInteger );
+}
+
+
+//!************************************************************************
+//! Check if a real value is valid
+//!
+//! @returns: true if valid
+//!************************************************************************
+bool SignalGenerator::checkValidReal
+    (
+    const double aRealValue         //!< real value
+    ) const
+{
+    return ( std::fabs( aRealValue - mSmc.mNoValueReal ) > 1.e-7 );
 }
 
 
@@ -500,6 +545,38 @@ QString SignalGenerator::createSignalStringNoise
 
 
 //!************************************************************************
+//! Create a SMC signal with data read from a file
+//!
+//! @returns nothing
+//!************************************************************************
+void SignalGenerator::createSmcSignal()
+{
+    mAudioBufferLength = mSmc.mDataLengthSeconds;
+
+    if( mAudioSrc )
+    {
+        mAudioSrc->setBufferLength( mAudioBufferLength );
+    }
+
+    SignalItem::SignalSmc sig;
+    sig.nrPoints = mSmc.mDataValuesRecordedCount;
+    sig.sps = mSmc.mSamplingRate;
+    sig.maxAccelMs2 = std::max( std::fabs( mSmc.mMaximumFromRecord.accelerationMs2 ),
+                                std::fabs( mSmc.mMinimumFromRecord.accelerationMs2 ) );
+    sig.accelDataVec.resize( sig.nrPoints );
+    sig.accelDataVec = mSmc.mDataVector;
+
+    mCurrentSignalType = SignalItem::SIGNAL_TYPE_SMC;
+    int crtTab = mCurrentSignalType - SignalItem::SIGNAL_TYPE_FIRST;
+    mMainUi->SignalTypesTab->setCurrentIndex( crtTab );
+    handleSignalTypeChanged();
+
+    SignalItem* smcSignal = new SignalItem( sig );
+    mSignalsVector.push_back( smcSignal );
+}
+
+
+//!************************************************************************
 //! Create the map of tab signals
 //!
 //! @returns nothing
@@ -519,6 +596,7 @@ void SignalGenerator::createTabSignalsMap()
     mTabSignalsMap.insert( std::make_pair( SignalItem::SIGNAL_TYPE_SINDAMPSIN,  "SignalTabSinDampSin" ) );
     mTabSignalsMap.insert( std::make_pair( SignalItem::SIGNAL_TYPE_TRAPDAMPSIN, "SignalTabTrapDampSin" ) );
     mTabSignalsMap.insert( std::make_pair( SignalItem::SIGNAL_TYPE_NOISE,       "SignalTabNoise" ) );
+    mTabSignalsMap.insert( std::make_pair( SignalItem::SIGNAL_TYPE_SMC,         "SignalTabSmc" ) );
 }
 
 
@@ -692,6 +770,87 @@ void SignalGenerator::fillValuesNoise()
     mMainUi->NoiseOffsetEdit->setText( QString::number( mSignalNoise.offset ) );
 }
 
+//!************************************************************************
+//! Update the field values of SMC tab
+//!
+//! @returns nothing
+//!************************************************************************
+void SignalGenerator::fillValuesSmc()
+{
+    mMainUi->SmcFilenameValue->setText( QString::fromStdString( mSmcInputFilename ) );
+
+    mMainUi->SmcDataTypeValue->setText( QString::fromStdString( Smc::DATA_TYPE_FILE_STRINGS.at( mSmc.mTextDataTypeFile ) ) );
+
+    // earthquake
+    mMainUi->SmcEqNameValue->setText( QString::fromStdString( mSmc.mTextEarthquakeName ) );
+
+    mMainUi->SmcEqDateValue->setText( QString::fromStdString( mSmc.mEarthquakeTimeStamp ) );
+    mMainUi->SmcEqTimezoneValue->setText( QString::fromStdString( mSmc.mTextTimeZone ) );
+
+    mMainUi->SmcEqMwValue->setText( QString::fromStdString( mSmc.mTextMomentMagnitude ) );
+    mMainUi->SmcEqMsValue->setText( QString::fromStdString( mSmc.mTextSurfaceWaveMagnitude ) );
+    mMainUi->SmcEqMlValue->setText( QString::fromStdString( mSmc.mTextLocalMagnitude ) );
+
+    mMainUi->SmcEqLatValue->setText( QString::number( mSmc.mEpicenter.latitude ) );
+    mMainUi->SmcEqLonValue->setText( QString::number( mSmc.mEpicenter.longitude ) );
+    mMainUi->SmcEqDepthValue->setText( QString::number( mSmc.mEpicenter.depthKm ) );
+
+    // station
+    mMainUi->SmcStationNameValue->setText( QString::fromStdString( mSmc.mTextStationName ) );
+    mMainUi->SmcStationCodeValue->setText( QString::fromStdString( mSmc.mTextStationCodeStr ) );
+    mMainUi->SmcStationComponentValue->setText( QString::fromStdString( mSmc.mTextComponentOrientation ) );
+    mMainUi->SmcStationEpicentralDistValue->setText( QString::fromStdString( mSmc.mTextEpicentralDistanceKm ) );
+
+    const double MS2_TO_G = 9.80665;
+    double pkAccelG = 0;
+
+    try
+    {
+        double pkAccelMs2 = std::stod( mSmc.mTextPeakAcceleration );
+        pkAccelG = pkAccelMs2 / MS2_TO_G;
+    }
+    catch( const std::invalid_argument& )
+    {
+    }
+
+    QString pkAccelFormattedStr = QString::fromStdString( mSmc.mTextPeakAcceleration ) + " [m/s2] = " + QString::number( pkAccelG ) + " [g]";
+    mMainUi->SmcStationPkAccelValue->setText( pkAccelFormattedStr );
+    mMainUi->SmcStationStructureTypeValue->setText( QString::fromStdString( mSmc.mStructureTypeName ) );
+
+    // instrument
+    mMainUi->SmcInstTypeValue->setText( QString::fromStdString( mSmc.mSensorTypeStr ) );
+    mMainUi->SmcInstDataSourceValue->setText( QString::fromStdString( mSmc.mTextDataSourceStr ) );
+    mMainUi->SmcInstCutoffValue->setText( checkValidReal( mSmc.mSensorCutoffFrequency ) ? QString::number( mSmc.mSensorCutoffFrequency ) : NA_STR );
+    mMainUi->SmcInstDampingCoeffValue->setText( checkValidReal( mSmc.mSensorDampingCoefficient ) ? QString::number( mSmc.mSensorDampingCoefficient ) : NA_STR );
+    mMainUi->SmcInstVOrientationValue->setText( checkValidInteger( mSmc.mVerticalOrientation ) ? QString::number( mSmc.mVerticalOrientation ) : NA_STR );
+    mMainUi->SmcInstHOrientationValue->setText( checkValidInteger( mSmc.mHorizontalOrientation ) ? QString::number( mSmc.mHorizontalOrientation ) : NA_STR );
+
+    // time series
+    mMainUi->SmcTimeUsablePointsValue->setText( checkValidInteger( mSmc.mDataValuesRecordedCount ) ? QString::number( mSmc.mDataValuesRecordedCount ) : NA_STR );
+
+    mMainUi->SmcTimeSpsValue->setText( QString::number( mSmc.mSamplingRate ) );
+    mMainUi->SmcTimeDurationValue->setText( QString::number( mSmc.mDataLengthSeconds ) );
+    mMainUi->BufferLengthSpin->setValue( mAudioBufferLength );
+
+    if( checkValidReal( mSmc.mMaximumFromRecord.accelerationMs2 ) )
+    {
+        mMainUi->SmcTimeAccelMaxGValue->setText( QString::number( mSmc.mMaximumFromRecord.accelerationMs2 / MS2_TO_G ) );
+    }
+    else
+    {
+        mMainUi->SmcTimeAccelMaxGValue->setText( NA_STR );
+    }
+
+    if( checkValidReal( mSmc.mMinimumFromRecord.accelerationMs2 ) )
+    {
+        mMainUi->SmcTimeAccelMinGValue->setText( QString::number( mSmc.mMinimumFromRecord.accelerationMs2 / MS2_TO_G ) );
+    }
+    else
+    {
+        mMainUi->SmcTimeAccelMinGValue->setText( NA_STR );
+    }
+}
+
 
 //!************************************************************************
 //! Handle for changing the audio buffer length (seconds)
@@ -700,7 +859,7 @@ void SignalGenerator::fillValuesNoise()
 //!************************************************************************
 /* slot */ void SignalGenerator::handleAudioBufferLengthChanged
     (
-    int aValue      //!< value
+    double aValue      //!< value
     )
 {
     mAudioBufferLength = aValue;
@@ -744,7 +903,7 @@ void SignalGenerator::handleDeviceChanged
         mAudioSrc->stop();
     }
 
-    initializeAudio( mMainUi->GenerateDeviceComboBox->itemData( aIndex ).value<QAudioDeviceInfo>() );
+    initializeAudio( mMainUi->GenerateDeviceComboBox->itemData( aIndex ).value<QAudioDevice>() );
 
     if( mSignalReady )
     {
@@ -817,6 +976,8 @@ void SignalGenerator::handleDeviceChanged
                 crtSignal = new SignalItem( mSignalNoise );
                 break;
 
+            case SignalItem::SIGNAL_TYPE_SMC:
+                // intentionally do nothing
             default:
                 break;
         }
@@ -904,6 +1065,8 @@ void SignalGenerator::handleDeviceChanged
                     }
                     break;
 
+                case SignalItem::SIGNAL_TYPE_SMC:
+                    // intentionally do nothing
                 default:
                     break;
             }
@@ -990,6 +1153,8 @@ void SignalGenerator::handleDeviceChanged
                     mSignalsListModel.setData( index, createSignalStringNoise( mSignalNoise ) );
                     break;
 
+                case SignalItem::SIGNAL_TYPE_SMC:
+                    // intentionally do nothing
                 default:
                     break;
             }
@@ -1122,6 +1287,8 @@ void SignalGenerator::handleDeviceChanged
                 }
                 break;
 
+            case SignalItem::SIGNAL_TYPE_SMC:
+                // intentionally do nothing
             default:
                 break;
         }
@@ -1216,6 +1383,8 @@ void SignalGenerator::handleDeviceChanged
                     lineString += "\n";
                     break;
 
+                case SignalItem::SIGNAL_TYPE_SMC:
+                    // intentionally do nothing
                 default:
                     break;
             }
@@ -1363,6 +1532,11 @@ void SignalGenerator::handleGeneratePauseResume()
 //!************************************************************************
 void SignalGenerator::handleGenerateStop()
 {
+    if( QAudio::ActiveState == mAudioOutput->state() )
+    {
+        mAudioOutput->suspend();
+    }
+
     mAudioOutput->stop();
 
     if( mAudioSrc )
@@ -1401,7 +1575,13 @@ void SignalGenerator::handleGenerateStop()
         mSignalReady = false;
         mSignalStarted = false;
         mSignalPaused = false;
+        mSignalIsSmc = false;
         mIsSignalEdited = false;
+
+        mCurrentSignalType = SignalItem::SIGNAL_TYPE_TRIANGLE;
+        int crtTab = mCurrentSignalType - SignalItem::SIGNAL_TYPE_FIRST;
+        mMainUi->SignalTypesTab->setCurrentIndex( crtTab );
+        handleSignalTypeChanged();
 
         mSignalsListModel.removeRows( 0, mSignalsVector.size() );
         mSignalsVector.clear();
@@ -1445,6 +1625,7 @@ void SignalGenerator::handleGenerateStop()
         mSignalReady = false;
         mSignalStarted = false;
         mSignalPaused = false;
+        mSignalIsSmc = false;
         mIsSignalEdited = false;
 
         mSignalsListModel.removeRows( 0, mSignalsVector.size() );
@@ -1473,7 +1654,6 @@ void SignalGenerator::handleGenerateStop()
         {
             const std::string DELIM = ", ";
             std::string currentLine;
-
 
             while( getline( inputFile, currentLine ) )
             {
@@ -2372,6 +2552,8 @@ void SignalGenerator::handleGenerateStop()
                             }
                             break;
 
+                        case SignalItem::SIGNAL_TYPE_SMC:
+                            // intentionally do nothing
                         default:
                             break;
                     }
@@ -2394,6 +2576,7 @@ void SignalGenerator::handleGenerateStop()
             {
                 mSignalUndefined = false;
                 mSignalReady = true;
+                mSignalIsSmc = false;
 
                 setAudioData();
             }
@@ -4541,14 +4724,14 @@ void SignalGenerator::handleSignalChangedNoiseGamma
 
     if( tabWidget )
     {
-        tabName = tabWidget->objectName();
+        tabName = tabWidget->objectName();        
     }
 
     for( auto const& crtTabSignalMap : mTabSignalsMap )
     {
         if( tabName == crtTabSignalMap.second.c_str() )
         {
-            mCurrentSignalType = crtTabSignalMap.first;
+            mCurrentSignalType = crtTabSignalMap.first;            
         }
     }
 
@@ -4557,6 +4740,648 @@ void SignalGenerator::handleSignalChangedNoiseGamma
         mEditedSignal = nullptr;
         mIsSignalEdited = false;
         updateControls();
+    }
+}
+
+
+//!************************************************************************
+//! Open an accelerogram from a SMC (Strong Motion CD) data file
+//!
+//! @returns nothing
+//!************************************************************************
+/* slot */ void SignalGenerator::handleSmcOpen()
+{
+    if( !mSignalUndefined && !mSignalReady )
+    {
+        QString msg = "Please save the current signal first.";
+        QMessageBox msgBox;
+        msgBox.setText( msg );
+        msgBox.exec();
+    }
+    else if( !mSignalUndefined && mSignalStarted )
+    {
+        QString msg = "Please stop generating the current signal first.";
+        QMessageBox msgBox;
+        msgBox.setText( msg );
+        msgBox.exec();
+    }
+    else
+    {
+        mSignalUndefined = true;
+        mSignalReady = false;
+        mSignalStarted = false;
+        mSignalPaused = false;
+        mSignalIsSmc = false;
+        mIsSignalEdited = false;
+
+        mSignalsVector.clear();
+
+        mAudioOutput->stop();
+
+        if( mAudioSrc )
+        {
+            mAudioSrc->stop();
+        }
+
+        QString selectedFilter;
+        QString fileName = QFileDialog::getOpenFileName( this,
+                                                         "Open SMC file",
+                                                         "",
+                                                         "SMC files (*.smc);;All files (*)",
+                                                         &selectedFilter,
+                                                         QFileDialog::DontUseNativeDialog
+                                                        );
+
+        mSmcInputFilename = fileName.toStdString();
+        std::ifstream inputFile( mSmcInputFilename );
+
+        if( inputFile.is_open() )
+        {
+            mSmc = Smc();
+
+            std::vector<int16_t> intHeaderVec;
+            intHeaderVec.resize( Smc::HEADER_INT_LINES_COUNT * Smc::HEADER_INT_VALUES_PER_LINE );
+
+            std::vector<double> realHeaderVec;
+            realHeaderVec.resize( Smc::HEADER_REAL_LINES_COUNT * Smc::HEADER_REAL_VALUES_PER_LINE );
+
+            std::vector<std::string> substringsVec;
+
+            const std::string STAR = "*";
+
+            std::string currentLine;
+            int crtLineNr = 0;
+
+            while( getline( inputFile, currentLine ) && mSmc.mSmcFormatOk )
+            {
+                crtLineNr++;
+
+                if( crtLineNr <= Smc::LAST_TEXT_LINE_NR )
+                {
+                    ///////////////////////
+                    // text header
+                    ///////////////////////
+
+                    switch( crtLineNr )
+                    {
+                        case 1:
+                            {
+                                bool typefound = false;
+                                size_t i = 0;
+                                trim( currentLine );
+
+                                for( i = 0; i < Smc::DATA_TYPE_FILE_STRINGS.size(); i++ )
+                                {
+                                    if( Smc::DATA_TYPE_FILE_STRINGS.at( static_cast<Smc::DataTypeFile>( i ) ) == currentLine )
+                                    {
+                                        typefound = true;
+                                        break;
+                                    }
+                                }
+
+                                if( !typefound )
+                                {
+                                    mSmc.mSmcFormatOk = false;
+                                    mSmc.mSmcTypeAccelerogram = false;
+
+                                    QString msg = "Current file has no SMC header.";
+                                    QMessageBox msgBox;
+                                    msgBox.setText( msg );
+                                    msgBox.exec();
+
+                                    break;
+                                }
+                                else
+                                {
+                                    mSmc.mTextDataTypeFile = static_cast<Smc::DataTypeFile>( i );
+
+                                    if( Smc::DATA_TYPE_FILE_UNCORRECTED_ACCELEROGRAM != mSmc.mTextDataTypeFile
+                                     && Smc::DATA_TYPE_FILE_CORRECTED_ACCELEROGRAM != mSmc.mTextDataTypeFile )
+                                    {
+                                        mSmc.mSmcTypeAccelerogram = false;
+                                    }
+
+                                    if( !mSmc.mSmcTypeAccelerogram )
+                                    {
+                                        QString msg = "Current file is not an accelerogram in SMC format.";
+                                        QMessageBox msgBox;
+                                        msgBox.setText( msg );
+                                        msgBox.exec();
+
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 3:
+                            trim( currentLine );
+
+                            if( STAR != currentLine )
+                            {
+                                mSmc.mTextStationCodeStr = currentLine;
+                            }
+                            break;
+
+                        case 4:
+                            {
+                                std::string tmpStr = currentLine.substr( 0, 3 );
+
+                                for( char c : tmpStr )
+                                {
+                                    if( ' ' != c )
+                                    {
+                                        mSmc.mTextTimeZone = tmpStr;
+                                        break;
+                                    }
+                                }
+
+                                mSmc.mTextEarthquakeYear = currentLine.substr( 5, 4 );
+                                mSmc.mTextEarthquakeMonth = currentLine.substr( 11, 2 );
+                                mSmc.mTextEarthquakeDay = currentLine.substr( 15, 2 );
+                                mSmc.mTextEarthquakeHour = currentLine.substr( 21, 2 );
+                                mSmc.mTextEarthquakeMinute = currentLine.substr( 23, 2 );
+
+                                mSmc.mEarthquakeTimeStamp = mSmc.mTextEarthquakeYear + "." + mSmc.mTextEarthquakeMonth + "." + mSmc.mTextEarthquakeDay;
+                                mSmc.mEarthquakeTimeStamp += " " + mSmc.mTextEarthquakeHour + ":" + mSmc.mTextEarthquakeMinute;
+
+                                tmpStr = currentLine.substr( 26, 53 );
+                                trim( tmpStr );
+                                mSmc.mTextEarthquakeName = tmpStr;
+                            }
+                            break;
+
+                        case 5:
+                            mSmc.mSmcFormatOk = ( "Moment Mag=" == currentLine.substr( 0, 11 )
+                                               && "Ms=" == currentLine.substr( 21, 3 )
+                                               && "Ml=" == currentLine.substr( 34, 3 ) );
+
+                            if( mSmc.mSmcFormatOk )
+                            {
+                                std::string tmpStr = currentLine.substr( 11, 9 );
+                                trim( tmpStr );
+                                mSmc.mTextMomentMagnitude = tmpStr;
+
+                                tmpStr = currentLine.substr( 24, 9 );
+                                trim( tmpStr );
+                                mSmc.mTextSurfaceWaveMagnitude = tmpStr;
+
+                                tmpStr = currentLine.substr( 37, 9 );
+                                trim( tmpStr );
+                                mSmc.mTextLocalMagnitude = tmpStr;
+                            }
+                            break;
+
+                        case 6:
+                            mSmc.mSmcFormatOk = ( ( "station = " == currentLine.substr( 0, 10 ) || "Station = " == currentLine.substr( 0, 10 ) )
+                                               && "component=" == currentLine.substr( 41, 10 ) );
+
+                            if( mSmc.mSmcFormatOk )
+                            {
+                                std::string tmpStr = currentLine.substr( 10, 30 );
+                                trim( tmpStr );
+                                mSmc.mTextStationName = tmpStr;
+
+                                tmpStr = currentLine.substr( 52, 6 );
+                                trim( tmpStr );
+                                mSmc.mTextComponentOrientation = tmpStr;
+                            }
+                            else
+                            {
+                                mSmc.mSmcFormatOk = ( ( "station = " == currentLine.substr( 0, 10 ) || "Station = " == currentLine.substr( 0, 10 ) )
+                                                   && "component=" == currentLine.substr( 36, 10 ) );
+
+                                if( mSmc.mSmcFormatOk )
+                                {
+                                    std::string tmpStr = currentLine.substr( 10, 25 );
+                                    trim( tmpStr );
+                                    mSmc.mTextStationName = tmpStr;
+
+                                    tmpStr = currentLine.substr( 47, 6 );
+                                    trim( tmpStr );
+                                    mSmc.mTextComponentOrientation = tmpStr;
+                                }
+                            }
+                            break;
+
+                        case 7:
+                            mSmc.mSmcFormatOk = ( "epicentral dist =" == currentLine.substr( 0, 17 )
+                                             && ( "pk acc =" == currentLine.substr( 33, 8 )
+                                               || "pk     =" == currentLine.substr( 33, 8 ) )
+                                                );
+
+                            if( mSmc.mSmcFormatOk )
+                            {
+                                std::string tmpStr = currentLine.substr( 17, 9 );
+                                trim( tmpStr );
+                                mSmc.mTextEpicentralDistanceKm = tmpStr;
+
+                                tmpStr = currentLine.substr( 41, 10 );
+                                trim( tmpStr );
+
+                                try
+                                {
+                                    // if a value is provided, convert cm/s2 -> m/s2
+                                    double pkAccel = std::stod( tmpStr );
+                                    pkAccel *= 1.e-2;
+                                    mSmc.mTextPeakAcceleration = std::to_string( pkAccel );
+                                }
+                                catch( const std::invalid_argument& )
+                                {
+                                    mSmc.mTextPeakAcceleration = tmpStr;
+                                }
+                            }
+                            break;
+
+                        case 8:
+                            mSmc.mSmcFormatOk = ( "inst type=" == currentLine.substr( 0, 10 )
+                                               && "data source =" == currentLine.substr( 21, 13 ) );
+
+                            if( mSmc.mSmcFormatOk )
+                            {
+                                std::string tmpStr = currentLine.substr( 10, 5 );
+                                trim( tmpStr );
+                                mSmc.mTextSensorTypeStr = tmpStr;
+
+                                tmpStr = currentLine.substr( 35, 45 );
+                                trim( tmpStr );
+                                mSmc.mTextDataSourceStr = tmpStr;
+                            }
+                            break;
+
+                        case 2:
+                        case 9:
+                        case 10:
+                        case 11:
+                            trim( currentLine );
+
+                            if( mSmc.mSmcFormatOk )
+                            {
+                                mSmc.mSmcFormatOk = ( STAR == currentLine );
+                            }
+                            break;
+
+                        default:
+                            mSmc.mSmcFormatOk = false;
+                            break;
+                    }
+                }
+                else if( crtLineNr <= Smc::LAST_INT_LINE_NR )
+                {
+                    ///////////////////////
+                    // integer header
+                    ///////////////////////
+
+                    if( Smc::LAST_TEXT_LINE_NR + 1 == crtLineNr )
+                    {
+                        substringsVec.clear();
+                    }
+
+                    for( size_t i = 0; i < currentLine.size(); i += Smc::HEADER_INT_VALUE_LENGTH )
+                    {
+                        substringsVec.push_back( currentLine.substr( i, Smc::HEADER_INT_VALUE_LENGTH ) );
+                    }
+
+                    if( Smc::LAST_INT_LINE_NR == crtLineNr )
+                    {
+                        std::vector<int16_t> tmpIntVec( substringsVec.size() );
+
+                        for( size_t i = 0; i < tmpIntVec.size(); i++ )
+                        {
+                            tmpIntVec.at( i ) = std::stoi( substringsVec.at( i ) );
+                        }
+
+                        mSmc.mNoValueInteger = tmpIntVec.at( Smc::INT_FIELD_UNDEFINED_VALUE );
+
+                        mSmc.mVerticalOrientation = tmpIntVec.at( Smc::INT_FIELD_VERTICAL_ORIENTATION_FROM_UP );
+                        mSmc.mHorizontalOrientation = tmpIntVec.at( Smc::INT_FIELD_HORIZONTAL_ORIENTATION_FROM_NORTH_TO_EAST );
+
+                        mSmc.mSensorTypeCode = tmpIntVec.at( Smc::INT_FIELD_SENSOR_TYPE_CODE );
+
+                        if( checkValidInteger( mSmc.mSensorTypeCode ) )
+                        {
+                            mSmc.mSensorTypeStr = Smc::SENSOR_TYPE_NAMES.at( mSmc.mSensorTypeCode );
+                        }
+                        else
+                        {
+                            mSmc.mSensorTypeStr = "undefined";
+                        }
+
+                        mSmc.mHeaderCommentLinesCount = tmpIntVec.at( Smc::INT_FIELD_NR_OF_COMMENT_LINES );
+
+                        mSmc.mDataValuesCount = tmpIntVec.at( Smc::INT_FIELD_NR_OF_VALUES );
+
+                        if( checkValidInteger( mSmc.mDataValuesCount ) )
+                        {
+                            mSmc.mDataValuesRecordedCount = mSmc.mDataValuesCount;
+                        }
+                        else
+                        {
+                            mSmc.mSmcFormatOk = false;
+
+                            QString msg = "No valid data length found in SMC file.";
+                            QMessageBox msgBox;
+                            msgBox.setText( msg );
+                            msgBox.exec();
+
+                            break;
+                        }
+
+                        mSmc.mDataLinesCount = static_cast<uint16_t>( std::ceil( static_cast<double>( mSmc.mDataValuesCount ) / Smc::DATA_VALUES_PER_LINE ) );
+
+                        if( 0 == mSmc.mDataLinesCount )
+                        {
+                            mSmc.mSmcFormatOk = false;
+
+                            QString msg = "No data values specified in SMC file.";
+                            QMessageBox msgBox;
+                            msgBox.setText( msg );
+                            msgBox.exec();
+
+                            break;
+                        }
+
+                        mSmc.mStructureType = static_cast<Smc::StructureType>( tmpIntVec.at( Smc::INT_FIELD_STRUCTURE_TYPE ) );
+
+                        mSmc.mStructureTypeName = "unknown";
+
+                        if( mSmc.mStructureType <= Smc::STRUCTURE_TYPE_MAX_KNOWN )
+                        {
+                            mSmc.mStructureTypeName = Smc::STRUCTURE_TYPE_NAMES.at( mSmc.mStructureType );
+                        }
+
+                        switch( mSmc.mStructureType )
+                        {
+                            case Smc::STRUCTURE_TYPE_BUILDING:
+                                mSmc.mStructureBuilding.nrFloorsAboveGrade = tmpIntVec.at( Smc::INT_FIELD_TOTAL_NR_OF_FLOORS_ABOVE_GRADE );
+                                mSmc.mStructureBuilding.nrStoriesBelowGrade = tmpIntVec.at( Smc::INT_FIELD_TOTAL_NR_OF_STORIES_BELOW_GRADE );
+                                mSmc.mStructureBuilding.floorNrWhereLocated = tmpIntVec.at( Smc::INT_FIELD_FLOOR_NR );
+                                break;
+
+                            case Smc::STRUCTURE_TYPE_BRIDGE:
+                                mSmc.mStructureBridge.nrSpans = tmpIntVec.at( Smc::INT_FIELD_NR_OF_SPANS );
+                                mSmc.mStructureBridge.whereLocated =
+                                        static_cast<Smc::BridgeLocation>( tmpIntVec.at( static_cast<size_t>( Smc::INT_FIELD_TRANSDUCER_LOCATION_BRIDGES ) ) );
+                                break;
+
+                            case Smc::STRUCTURE_TYPE_DAM:
+                                mSmc.mStructureDam.location =
+                                    static_cast<Smc::DamLocation>( tmpIntVec.at( static_cast<size_t>( Smc::INT_FIELD_TRANSDUCER_LOCATION_DAMS ) ) );
+                                mSmc.mStructureDam.constructionType =
+                                    static_cast<Smc::DamConstructionType>( tmpIntVec.at( static_cast<size_t>( Smc::INT_FIELD_CONSTRUCTION_TYPE ) ) );
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        mSmc.mStationNr = tmpIntVec.at( Smc::INT_FIELD_STATION_NR );
+
+                        mSmc.mFirstRecordedSampleIndex = tmpIntVec.at( Smc::INT_FIELD_FIRST_RECORDED_SAMPLE );
+                        mSmc.mLastRecordedSampleIndex = tmpIntVec.at( Smc::INT_FIELD_LAST_RECORDED_SAMPLE );
+
+                        if( checkValidInteger( mSmc.mFirstRecordedSampleIndex ) )
+                        {
+                            if( mSmc.mFirstRecordedSampleIndex >= 1
+                             && mSmc.mFirstRecordedSampleIndex <= mSmc.mDataValuesCount )
+                            {
+                                mSmc.mDataValuesRecordedCount -= ( mSmc.mFirstRecordedSampleIndex - 1 );
+                            }
+                            else
+                            {
+                                mSmc.mFirstRecordedSampleIndex = 1;
+                            }
+                        }
+                        else
+                        {
+                            mSmc.mFirstRecordedSampleIndex = 1;
+                        }
+
+                        if( checkValidInteger( mSmc.mLastRecordedSampleIndex ) )
+                        {
+                            if( mSmc.mLastRecordedSampleIndex <= mSmc.mDataValuesCount
+                             && mSmc.mLastRecordedSampleIndex >= 1 )
+                            {
+                                mSmc.mDataValuesRecordedCount -= ( mSmc.mDataValuesCount - mSmc.mLastRecordedSampleIndex );
+                            }
+                            else
+                            {
+                                mSmc.mLastRecordedSampleIndex = mSmc.mDataValuesCount;
+                            }
+                        }
+                        else
+                        {
+                            mSmc.mLastRecordedSampleIndex = mSmc.mDataValuesCount;
+                        }
+
+                        mSmc.mDataVector.resize( mSmc.mDataValuesRecordedCount );
+                    }
+                }
+                else if( crtLineNr <= Smc::LAST_REAL_LINE_NR )
+                {
+                    ///////////////////////
+                    // real header
+                    ///////////////////////
+
+                    if( Smc::LAST_INT_LINE_NR + 1 == crtLineNr )
+                    {
+                        substringsVec.clear();
+                    }
+
+                    for( size_t i = 0; i < currentLine.size(); i += Smc::HEADER_REAL_VALUE_LENGTH )
+                    {
+                        substringsVec.push_back( currentLine.substr( i, Smc::HEADER_REAL_VALUE_LENGTH ) );
+                    }
+
+                    if( Smc::LAST_REAL_LINE_NR == crtLineNr )
+                    {
+                        std::vector<double> tmpRealVec( substringsVec.size() );
+
+                        for( size_t i = 0; i < tmpRealVec.size(); i++ )
+                        {
+                            tmpRealVec.at( i ) = std::stod( substringsVec.at( i ) );
+                        }
+
+                        mSmc.mNoValueReal = tmpRealVec.at( Smc::REAL_FIELD_UNDEFINED_VALUE );
+
+                        mSmc.mSamplingRate = tmpRealVec.at( Smc::REAL_FIELD_SAMPLING_RATE );
+
+                        if( checkValidReal( mSmc.mSamplingRate ) )
+                        {
+                            if( mSmc.mSamplingRate > 0 )
+                            {
+                                mSmc.mDataLengthSeconds = mSmc.mDataValuesRecordedCount / mSmc.mSamplingRate;
+                            }
+                            else
+                            {
+                                mSmc.mSmcFormatOk = false;
+
+                                QString msg = "Invalid sampling rate value found in SMC file.";
+                                QMessageBox msgBox;
+                                msgBox.setText( msg );
+                                msgBox.exec();
+
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            mSmc.mSmcFormatOk = false;
+
+                            QString msg = "No data sampling rate found in SMC file.";
+                            QMessageBox msgBox;
+                            msgBox.setText( msg );
+                            msgBox.exec();
+
+                            break;
+                        }
+
+                        mSmc.mEpicenter.latitude = tmpRealVec.at( Smc::REAL_FIELD_EARTHQUAKE_LATITUDE );
+                        mSmc.mEpicenter.longitude = tmpRealVec.at( Smc::REAL_FIELD_EARTHQUAKE_LONGITUDE );
+                        mSmc.mEpicenter.depthKm = tmpRealVec.at( Smc::REAL_FIELD_EARTHQUAKE_DEPTH_KM );
+
+                        mSmc.mEarthquakeMagnitude.momentMagnitude = tmpRealVec.at( Smc::REAL_FIELD_SOURCE_MOMENT_MAGNITUDE );
+                        mSmc.mEarthquakeMagnitude.surfaceWaveMagnitude = tmpRealVec.at( Smc::REAL_FIELD_SOURCE_SURFACE_WAVE_MAGNITUDE );
+                        mSmc.mEarthquakeMagnitude.localMagnitude = tmpRealVec.at( Smc::REAL_FIELD_SOURCE_LOCAL_MAGNITUDE );
+                        mSmc.mEarthquakeMagnitude.other = tmpRealVec.at( Smc::REAL_FIELD_SOURCE_OTHER );
+
+                        mSmc.mSeismicMomentNm = tmpRealVec.at( Smc::REAL_FIELD_SEISMIC_MOMENT_DYNE_CM );
+
+                        if( checkValidReal( mSmc.mSeismicMomentNm ) )
+                        {
+                            mSmc.mSeismicMomentNm *= 1.e-7; // dyn-cm to Nm
+                        }
+
+                        mSmc.mStation.latitude = tmpRealVec.at( Smc::REAL_FIELD_STATION_LATITUDE );
+                        mSmc.mStation.longitude = tmpRealVec.at( Smc::REAL_FIELD_STATION_LONGITUDE );
+                        mSmc.mStation.elevationMeters = tmpRealVec.at( Smc::REAL_FIELD_STATION_ELEVATION_M );
+                        mSmc.mStation.offsetNorthMeters = tmpRealVec.at( Smc::REAL_FIELD_STATION_OFFSET_N_M );
+                        mSmc.mStation.offsetEastMeters = tmpRealVec.at( Smc::REAL_FIELD_STATION_OFFSET_E_M );
+                        mSmc.mStation.offsetUpMeters = tmpRealVec.at( Smc::REAL_FIELD_STATION_OFFSET_UP_M );
+
+                        mSmc.mEpicentralDistanceKm = tmpRealVec.at( Smc::REAL_FIELD_EPICENTRAL_DISTANCE_KM );
+                        mSmc.mEpicenterToStationAzimuth = tmpRealVec.at( Smc::REAL_FIELD_EPICENTER_TO_STATION_AZIMUTH );
+
+                        mSmc.mDigitizationUnitsPerCm = tmpRealVec.at( Smc::REAL_FIELD_DIGITIZATION_UNITS_1_CM );
+
+                        mSmc.mSensorCutoffFrequency = tmpRealVec.at( Smc::REAL_FIELD_SENSOR_CUTOFF_FREQUENCY_HZ );
+                        mSmc.mSensorDampingCoefficient = tmpRealVec.at( Smc::REAL_FIELD_SENSOR_DAMPING_COEFFICIENT );
+
+                        mSmc.mRecorderSensitivityCmG = tmpRealVec.at( Smc::REAL_FIELD_RECORDER_SENSITIVITY_CM_G );
+
+                        mSmc.mMaximumFromRecord.time = tmpRealVec.at( Smc::REAL_FIELD_TIME_OF_MAXIMUM_S );
+                        mSmc.mMaximumFromRecord.accelerationMs2 = tmpRealVec.at( Smc::REAL_FIELD_VALUE_OF_MAXIMUM_CM_S2 );
+
+                        if( checkValidReal( mSmc.mMaximumFromRecord.accelerationMs2 ) )
+                        {
+                            mSmc.mMaximumFromRecord.accelerationMs2 *= 1.e-2; // m/s2
+                        }
+
+                        mSmc.mMinimumFromRecord.time = tmpRealVec.at( Smc::REAL_FIELD_TIME_OF_MINIMUM_S );
+                        mSmc.mMinimumFromRecord.accelerationMs2 = tmpRealVec.at( Smc::REAL_FIELD_VALUE_OF_MINIMUM_CM_S2 );
+
+                        if( checkValidReal( mSmc.mMinimumFromRecord.accelerationMs2 ) )
+                        {
+                            mSmc.mMinimumFromRecord.accelerationMs2 *= 1.e-2; // m/s2
+                        }
+                    }
+                }
+                else if( crtLineNr <= Smc::LAST_REAL_LINE_NR + mSmc.mHeaderCommentLinesCount )
+                {
+                    ///////////////////////
+                    // comments header
+                    ///////////////////////
+
+                    if( Smc::LAST_INT_LINE_NR + 1 == crtLineNr )
+                    {
+                        substringsVec.clear();
+                    }
+
+                    substringsVec.push_back( currentLine );
+
+                    if( Smc::LAST_REAL_LINE_NR + mSmc.mHeaderCommentLinesCount == crtLineNr )
+                    {
+                        // intentionally do nothing
+                    }
+                }
+                else if( crtLineNr <= Smc::LAST_REAL_LINE_NR + mSmc.mHeaderCommentLinesCount + mSmc.mDataLinesCount )
+                {
+                    ///////////////////////
+                    // data
+                    ///////////////////////
+
+                    if( Smc::LAST_REAL_LINE_NR + mSmc.mHeaderCommentLinesCount + 1 == crtLineNr )
+                    {
+                        substringsVec.clear();
+                    }
+
+                    for( size_t i = 0; i < currentLine.size(); i += Smc::DATA_VALUE_LENGTH )
+                    {
+                        substringsVec.push_back( currentLine.substr( i, Smc::DATA_VALUE_LENGTH ) );
+                    }
+
+                    if( Smc::LAST_REAL_LINE_NR + mSmc.mHeaderCommentLinesCount + mSmc.mDataLinesCount == crtLineNr )
+                    {
+                        std::vector<double> dataVec( substringsVec.size() );
+
+                        for( size_t i = 0; i < dataVec.size(); i++ )
+                        {
+                            dataVec.at( i ) = std::stod( substringsVec.at( i ) );
+                        }
+
+                        if( dataVec.size() != mSmc.mDataValuesCount )
+                        {
+                            mSmc.mSmcFormatOk = false;
+
+                            QString msg = "Expected data length was " + QString::number( mSmc.mDataValuesCount )
+                                    + " , it is " + QString::number( dataVec.size() ) + ".";
+                            QMessageBox msgBox;
+                            msgBox.setText( msg );
+                            msgBox.exec();
+
+                            break;
+                        }
+
+                        size_t firstRecordedIndex = mSmc.mFirstRecordedSampleIndex - 1;
+                        size_t lastRecordedIndex = dataVec.size() - 1 - ( mSmc.mDataValuesCount - mSmc.mLastRecordedSampleIndex );
+
+                        for( size_t i = firstRecordedIndex, j = 0; i <= lastRecordedIndex; i++, j++ )
+                        {
+                            mSmc.mDataVector.at( j ) = 0.1 * dataVec.at( i ); // m/s2
+                        }
+                    }
+                }
+            }
+
+            inputFile.close();
+
+            if( mSmc.mSmcFormatOk )
+            {
+                mSignalUndefined = false;
+                mSignalReady = true;
+                mSignalIsSmc = true;
+
+                createSmcSignal();
+
+                setAudioData();
+            }
+            else
+            {
+                QString msg = "SMC file format is wrong at line " + QString::number( crtLineNr ) + ".";
+                QMessageBox msgBox;
+                msgBox.setText( msg );
+                msgBox.exec();
+            }
+
+            updateControls();
+        }
+        else if( fileName.size() )
+        {
+            QString msg = "Could not open file \"" + fileName +"\".";
+            QMessageBox msgBox;
+            msgBox.setText( msg );
+            msgBox.exec();
+        }
     }
 }
 
@@ -4587,22 +5412,18 @@ void SignalGenerator::handleSignalChangedNoiseGamma
 //!************************************************************************
 bool SignalGenerator::initializeAudio
     (
-    const QAudioDeviceInfo&     aDeviceInfo     //!< audio device
+    const QAudioDevice&     aDeviceInfo     //!< audio device
     )
 {
     bool status = false;
-    QAudioFormat format;
+    QAudioFormat format = aDeviceInfo.preferredFormat();
     format.setSampleRate( 44100 );
-    format.setChannelCount( 1 );
-    format.setSampleSize( 16 );
-    format.setCodec( "audio/pcm" );
-    format.setByteOrder( QAudioFormat::LittleEndian );
-    format.setSampleType( QAudioFormat::SignedInt );
+    format.setSampleFormat( QAudioFormat::Int16 );
 
     status = aDeviceInfo.isFormatSupported( format );
 
     mAudioSrc.reset( new AudioSource( format, mAudioBufferLength ) );
-    mAudioOutput.reset( new QAudioOutput( aDeviceInfo, format ) );
+    mAudioOutput.reset( new QAudioSink( aDeviceInfo, format ) );
 
     qreal initialVolume = QAudio::convertVolume( mAudioOutput->volume(),
                                                  QAudio::LinearVolumeScale,
@@ -4631,6 +5452,28 @@ void SignalGenerator::setAudioData()
 
 
 //!************************************************************************
+//! Trim a string at both ends
+//!
+//! @returns nothing
+//!************************************************************************
+void SignalGenerator::trim
+    (
+    std::string&    aString         //!< string to trim
+    )
+{
+    aString.erase( aString.begin(), std::find_if( aString.begin(), aString.end(), []( unsigned char ch )
+    {
+        return !std::isspace( ch );
+    }));
+
+    aString.erase( std::find_if( aString.rbegin(), aString.rend(), []( unsigned char ch )
+    {
+        return !std::isspace( ch );
+    } ).base(), aString.end());
+}
+
+
+//!************************************************************************
 //! Update on audio buffer timer timeout
 //!
 //! @returns: nothing
@@ -4642,7 +5485,7 @@ void SignalGenerator::updateAudioBufferTimer()
         mAudioBufferCounter++;
     }
 
-    int fill = 100 * ( mAudioBufferCounter % mAudioBufferLength );
+    int fill = 100 * ( mAudioBufferCounter % static_cast<int>( mAudioBufferLength ) );
 
     if( 1 != mAudioBufferLength )
     {
@@ -4654,31 +5497,107 @@ void SignalGenerator::updateAudioBufferTimer()
 
 
 //!************************************************************************
+//! Update when audio devices change
+//!
+//! @returns: nothing
+//!************************************************************************
+void SignalGenerator::updateAudioDevices()
+{
+    mMainUi->GenerateDeviceComboBox->clear();
+    const QList<QAudioDevice> devices = mDevices->audioOutputs();
+
+    for( const QAudioDevice &deviceInfo : devices )
+    {
+        mMainUi->GenerateDeviceComboBox->addItem( deviceInfo.description(), QVariant::fromValue( deviceInfo ) );
+    }
+}
+
+
+//!************************************************************************
 //! Update UI controls depending on current status
 //!
 //! @returns: nothing
 //!************************************************************************
 void SignalGenerator::updateControls()
-{
-    /////////////////////////////
-    // SignalItemGroupBox
-    /////////////////////////////
-    mMainUi->SignalTypesTab->setEnabled( !mSignalUndefined && !mSignalStarted );
+{    
+    const uint8_t SMC_TAB_INDEX = SignalItem::SIGNAL_TYPE_SMC - SignalItem::SIGNAL_TYPE_FIRST;
 
-    mMainUi->SignalItemActionButton->setEnabled( !mSignalUndefined && !mSignalStarted );
-    mMainUi->SignalItemActionButton->setText( mIsSignalEdited ? "Replace current signal item" : "Add to active signal" );
+    if( mSignalIsSmc )
+    {
+        for( int tabCtr = 0; tabCtr < mMainUi->SignalTypesTab->count(); tabCtr++ )
+        {
+            if( SMC_TAB_INDEX == tabCtr )
+            {
+                mMainUi->SignalTypesTab->setTabEnabled( tabCtr, true );
+            }
+            else
+            {
+                mMainUi->SignalTypesTab->setTabEnabled( tabCtr, false );
+            }
+        }
 
-    /////////////////////////////
-    // ActiveSignalGroupBox
-    /////////////////////////////
-    mMainUi->ActiveSignalGroupBox->setEnabled( !mSignalUndefined && !mSignalStarted );
+        mMainUi->SignalTypesTab->setEnabled( true );
 
-    bool activeSignalBtnCondition = !mSignalUndefined && mSignalsVector.size() && !mIsSignalEdited;
-    mMainUi->ActiveSignalEditButton->setEnabled( activeSignalBtnCondition );
-    mMainUi->ActiveSignalSaveButton->setEnabled( activeSignalBtnCondition );
-    mMainUi->ActiveSignalRemoveButton->setEnabled( activeSignalBtnCondition );
+        if( mMainUi->SignalItemActionButton->isVisible() )
+        {
+            mMainUi->SignalItemActionButton->hide();
+        }
 
-    mMainUi->ActiveSignalList->setEnabled( !mIsSignalEdited );
+        if( mMainUi->ActiveSignalGroupBox->isVisible() )
+        {
+            mMainUi->ActiveSignalGroupBox->hide();
+        }
+
+        mMainUi->BufferLengthSpin->setEnabled( false );
+
+        fillValuesSmc();
+    }
+    else
+    {
+        /////////////////////////////
+        // SignalItemGroupBox
+        /////////////////////////////
+        for( int tabCtr = 0; tabCtr < mMainUi->SignalTypesTab->count(); tabCtr++ )
+        {
+            if( SMC_TAB_INDEX == tabCtr )
+            {
+                mMainUi->SignalTypesTab->setTabEnabled( tabCtr, false );
+            }
+            else
+            {
+                mMainUi->SignalTypesTab->setTabEnabled( tabCtr, true );
+            }
+        }
+
+        if( !mMainUi->SignalItemActionButton->isVisible() )
+        {
+            mMainUi->SignalItemActionButton->show();
+        }
+
+        mMainUi->SignalTypesTab->setEnabled( !mSignalUndefined && !mSignalStarted );
+
+        mMainUi->SignalItemActionButton->setEnabled( !mSignalUndefined && !mSignalStarted );
+        mMainUi->SignalItemActionButton->setText( mIsSignalEdited ? "Replace current signal item" : "Add to active signal" );
+
+        /////////////////////////////
+        // ActiveSignalGroupBox
+        /////////////////////////////
+        if( !mMainUi->ActiveSignalGroupBox->isVisible() )
+        {
+            mMainUi->ActiveSignalGroupBox->show();
+        }
+
+        mMainUi->ActiveSignalGroupBox->setEnabled( !mSignalUndefined && !mSignalStarted );
+
+        mMainUi->BufferLengthSpin->setEnabled( !mSignalStarted && !mSignalPaused );
+
+        bool activeSignalBtnCondition = !mSignalUndefined && mSignalsVector.size() && !mIsSignalEdited;
+        mMainUi->ActiveSignalEditButton->setEnabled( activeSignalBtnCondition );
+        mMainUi->ActiveSignalSaveButton->setEnabled( activeSignalBtnCondition );
+        mMainUi->ActiveSignalRemoveButton->setEnabled( activeSignalBtnCondition );
+
+        mMainUi->ActiveSignalList->setEnabled( !mIsSignalEdited );
+    }
 
     /////////////////////////////
     // GenerateGroupBox
@@ -4688,7 +5607,6 @@ void SignalGenerator::updateControls()
     mMainUi->GeneratePauseButton->setText( mSignalPaused ? "Continue" : "Pause" );
 
     mMainUi->GenerateDeviceComboBox->setEnabled( !mSignalStarted && !mSignalPaused );
-    mMainUi->BufferLengthSpin->setEnabled( !mSignalStarted && !mSignalPaused );
 
     mMainUi->GenerateStartButton->setEnabled( mSignalReady && !mSignalStarted && !mSignalPaused );
     mMainUi->GeneratePauseButton->setEnabled( mSignalReady && mSignalStarted );

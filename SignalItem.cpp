@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2023 Mihai Ursu                                                 //
+// Copyright (C) 2023,2025 Mihai Ursu                                            //
 //                                                                               //
 // This program is free software; you can redistribute it and/or modify          //
 // it under the terms of the GNU General Public License as published by          //
@@ -168,6 +168,19 @@ SignalItem::SignalItem
     memcpy( &mSignalDataNoise, &aSignalData, sizeof( aSignalData ) );
 }
 
+//!************************************************************************
+//! Constructor for SMC signal type
+//!************************************************************************
+SignalItem::SignalItem
+    (
+    SignalSmc           aSignalData     //!< SMC signal data
+    )
+    : mType( SIGNAL_TYPE_SMC )
+{
+    cleanDataStructures();
+    memcpy( &mSignalDataSmc, &aSignalData, sizeof( aSignalData ) );
+}
+
 
 //!************************************************************************
 //! Clean all data structures
@@ -186,7 +199,8 @@ void SignalItem::cleanDataStructures()
     memset( &mSignalDataAmSin,          0, sizeof( mSignalDataAmSin ) );
     memset( &mSignalDataSinDampSin,     0, sizeof( mSignalDataSinDampSin ) );
     memset( &mSignalDataTrapDampSin,    0, sizeof( mSignalDataTrapDampSin ) );
-    memset( &mSignalDataNoise,          0, sizeof( mSignalDataNoise ) );    
+    memset( &mSignalDataNoise,          0, sizeof( mSignalDataNoise ) );
+    memset( &mSignalDataSmc,            0, sizeof( mSignalDataSmc ) );
 }
 
 
@@ -298,6 +312,16 @@ SignalItem::SignalTrapDampSin SignalItem::getSignalDataTrapDampSin() const
 SignalItem::SignalNoise SignalItem::getSignalDataNoise() const
 {
     return mSignalDataNoise;
+}
+
+//!************************************************************************
+//! Get SMC signal data
+//!
+//! @returns: SignalNoise data structure
+//!************************************************************************
+SignalItem::SignalSmc SignalItem::getSignalDataSmc() const
+{
+    return mSignalDataSmc;
 }
 
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2023 Mihai Ursu                                                 //
+// Copyright (C) 2023,2025 Mihai Ursu                                            //
 //                                                                               //
 // This program is free software; you can redistribute it and/or modify          //
 // it under the terms of the GNU General Public License as published by          //
@@ -24,6 +24,7 @@ This file contains the definitions for a signal item.
 #define SignalItem_h
 
 #include <cstdint>
+#include <vector>
 
 
 //************************************************************************
@@ -51,6 +52,7 @@ class SignalItem
             SIGNAL_TYPE_SINDAMPSIN,
             SIGNAL_TYPE_TRAPDAMPSIN,
             SIGNAL_TYPE_NOISE,
+            SIGNAL_TYPE_SMC,
 
             SIGNAL_TYPE_COUNT
         }SignalType;
@@ -358,6 +360,27 @@ class SignalItem
             }
         };
 
+        struct SignalSmc
+        {
+            SignalType type;
+
+            static constexpr double MAX_SCALE_ACCEL_MS2 = 11.768; // equivalent to 1.2g
+
+            double              maxAccelMs2;    // m/s2
+            uint16_t            nrPoints;
+            double              sps;
+            std::vector<double> accelDataVec;   // m/s2
+
+            SignalSmc()
+            {
+                type = SIGNAL_TYPE_SMC;
+
+                maxAccelMs2 = 0;
+                nrPoints = 0;
+                sps = 0;
+            }
+        };
+
 
     //************************************************************************
     // functions
@@ -418,6 +441,11 @@ class SignalItem
             SignalNoise         aSignalData     //!< Noise signal data
             );
 
+        SignalItem
+            (
+            SignalSmc           aSignalData     //!< SMC signal data
+            );
+
 
         SignalTriangle      getSignalDataTriangle() const;
         SignalRectangle     getSignalDataRectangle() const;
@@ -430,6 +458,7 @@ class SignalItem
         SignalSinDampSin    getSignalDataSinDampSin() const;
         SignalTrapDampSin   getSignalDataTrapDampSin() const;
         SignalNoise         getSignalDataNoise() const;
+        SignalSmc           getSignalDataSmc() const;
 
         SignalType          getType() const;
 
@@ -451,7 +480,8 @@ class SignalItem
         SignalAmSin             mSignalDataAmSin;               //!< data for AmSin signal type
         SignalSinDampSin        mSignalDataSinDampSin;          //!< data for SinDampSin signal type
         SignalTrapDampSin       mSignalDataTrapDampSin;         //!< data for TrapDampSin signal type
-        SignalNoise             mSignalDataNoise;               //!< data for Noise signal type
+        SignalNoise             mSignalDataNoise;               //!< data for Noise signal type       
+        SignalSmc               mSignalDataSmc;                 //!< data for SMC signal type
 
         SignalType              mType = SIGNAL_TYPE_INVALID;    //!< default signal type format
 };

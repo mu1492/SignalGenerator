@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2023 Mihai Ursu                                                 //
+// Copyright (C) 2023,2025 Mihai Ursu                                            //
 //                                                                               //
 // This program is free software; you can redistribute it and/or modify          //
 // it under the terms of the GNU General Public License as published by          //
@@ -67,10 +67,8 @@ qint64 AudioSource::bytesAvailable() const
 //!************************************************************************
 void AudioSource::fillDataBuffer()
 {
-    const int SAMPLE_BYTES = mAudioFormat.sampleSize() / 8;                         // = 2
-    const int CHANNEL_BYTES = mAudioFormat.channelCount() * SAMPLE_BYTES;           // = 2
-
-    qint64 bufferLength = mAudioFormat.sampleRate() * mAudioBufferLengthSeconds;    // = 44100 * DURATION_SECONDS
+    const int CHANNEL_BYTES = mAudioFormat.bytesPerSample();
+    qint64 bufferLength = mAudioFormat.bytesForDuration( mAudioBufferLengthSeconds * 1000000 );
     std::vector<double> totalNoiseBuffer( bufferLength );
 
     for( size_t k = 0; k < mSignalsVector.size(); k++ )
@@ -109,8 +107,6 @@ void AudioSource::fillDataBuffer()
         }
     }
 
-    bufferLength = mAudioFormat.sampleRate() * CHANNEL_BYTES * mAudioBufferLengthSeconds; // = 44100 * 2 * DURATION_SECONDS
-
     mAudioBuffer.resize( bufferLength );
     unsigned char* bufferData = reinterpret_cast<unsigned char *>( mAudioBuffer.data() );
 
@@ -122,23 +118,50 @@ void AudioSource::fillDataBuffer()
         outputFile.open( "out_raw.txt" );
     }
 
-    for( size_t i = 0; bufferLength > 0; bufferLength -= SAMPLE_BYTES, i++ )
+    for( size_t i = 0; bufferLength > 0; i++ )
     {
         double time = static_cast<double>( i % mAudioFormat.sampleRate() ) / mAudioFormat.sampleRate();
         time += static_cast<size_t>( i / mAudioFormat.sampleRate() );
         double yGenerated = getSignalValue( time );
         yGenerated += totalNoiseBuffer.at( i );
 
-        if( SAVE_TO_RAW_FILE && outputFile.is_open() )
+        for( int j = 0; j < mAudioFormat.channelCount(); j++ )
         {
-            QString line = QString::number( time ) + "\t" + QString::number( yGenerated ) + "\n";
-            outputFile << line.toStdString();
-        }
+            if( 0 == j )
+            {
+                if( SAVE_TO_RAW_FILE && outputFile.is_open() )
+                {
+                    QString line = QString::number( time ) + "\t" + QString::number( yGenerated ) + "\n";
+                    outputFile << line.toStdString();
+                }
+            }
 
-        int16_t yValue = static_cast<int16_t>( yGenerated * 32767 );
-        memcpy( bufferData, &yValue, sizeof( yValue ) );
-        bufferData += SAMPLE_BYTES;
-    }
+            switch( mAudioFormat.sampleFormat() )
+            {
+                case QAudioFormat::UInt8:
+                    *reinterpret_cast<uint8_t*>( bufferData ) = static_cast<uint8_t>( 255 * ( 1.0 + yGenerated ) / 2 );
+                    break;
+
+                case QAudioFormat::Int16:
+                    *reinterpret_cast<int16_t*>( bufferData ) = static_cast<int16_t>( yGenerated * 32767 );
+                    break;
+
+                case QAudioFormat::Int32:
+                    *reinterpret_cast<int32_t*>( bufferData ) = static_cast<int32_t>( yGenerated * std::numeric_limits<int32_t>::max() );
+                    break;
+
+                case QAudioFormat::Float:
+                    *reinterpret_cast<float*>( bufferData ) = yGenerated;
+                    break;
+
+                default:
+                    break;
+            }
+
+            bufferData += CHANNEL_BYTES;
+            bufferLength -= CHANNEL_BYTES;
+        }
+    }    
 
     if( SAVE_TO_RAW_FILE && outputFile.is_open() )
     {
@@ -327,6 +350,10 @@ double AudioSource::getSignalValue
 
             case SignalItem::SIGNAL_TYPE_TRAPDAMPSIN:
                 y += getSignalValueTrapDampSin( mSignalsVector.at( i )->getSignalDataTrapDampSin(), aTime );
+                break;
+
+            case SignalItem::SIGNAL_TYPE_SMC:
+                y += getSignalValueSmc( mSignalsVector.at( i )->getSignalDataSmc(), aTime );
                 break;
 
             case SignalItem::SIGNAL_TYPE_NOISE: // intentionally skip noise type
@@ -776,6 +803,46 @@ double AudioSource::getSignalValueNoise
 
 
 //!************************************************************************
+//! Get the value of a SMC signal
+//!
+//! @returns The signal value at a specified moment
+//!************************************************************************
+double AudioSource::getSignalValueSmc
+    (
+    const SignalItem::SignalSmc         aSignalData,    //!< SMC signal data
+    const double                        aTime           //!< time
+    ) const
+{
+    double y = 0;
+
+    if( aSignalData.sps > 0
+     && aSignalData.nrPoints
+     && aSignalData.accelDataVec.size()
+      )
+    {
+        double smcSignalDuration = aSignalData.nrPoints / aSignalData.sps;
+
+        if( aTime <= smcSignalDuration )
+        {
+            double dt = 1.0 / aSignalData.sps;
+            uint32_t kSample = std::floor( aTime / dt );
+            double tInSample = aTime - kSample * dt;
+
+            if( kSample < aSignalData.accelDataVec.size() )
+            {
+                double yL = ( kSample > 0 ) ? aSignalData.accelDataVec.at( kSample - 1 ) : 0;
+                double yR = aSignalData.accelDataVec.at( kSample );
+                y = yL + ( tInSample / dt ) * ( yR - yL );
+                y /= aSignalData.MAX_SCALE_ACCEL_MS2;
+            }
+        }
+    }
+
+    return y;
+}
+
+
+//!************************************************************************
 //! Check if the audio source is started
 //!
 //! @returns: If the device is open
@@ -855,7 +922,7 @@ qint64 AudioSource::readData
 //!************************************************************************
 void AudioSource::setBufferLength
     (
-    const uint32_t aLength          //!< a length in seconds
+    const double aLength          //!< a length in seconds
     )
 {
     mAudioBufferLengthSeconds = aLength;

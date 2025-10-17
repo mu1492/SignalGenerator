@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2023 Mihai Ursu                                                 //
+// Copyright (C) 2023,2025 Mihai Ursu                                            //
 //                                                                               //
 // This program is free software; you can redistribute it and/or modify          //
 // it under the terms of the GNU General Public License as published by          //
@@ -23,18 +23,24 @@ This file contains the definitions for the signal generator.
 #ifndef SignalGenerator_h
 #define SignalGenerator_h
 
+#include <QAudioDevice>
 #include <QAudioOutput>
+#include <QAudioSink>
 #include <QMainWindow>
+#include <QMediaDevices>
 #include <QMessageBox>
 #include <QStringListModel>
 #include <QTimer>
 
 #include <cmath>
+#include <cstdint>
 #include <map>
+#include <string>
 #include <vector>
 
-#include "SignalItem.h"
 #include "AudioSource.h"
+#include "SignalItem.h"
+#include "Smc.h"
 #include "./ui_About.h"
 
 
@@ -63,6 +69,7 @@ class SignalGenerator : public QMainWindow
         const QString GAMMA_SMALL = QString::fromUtf8( "\u03B3" );      //!< small Greek gamma
         const QString PHI_SMALL = QString::fromUtf8( "\u03C6" );        //!< small Greek phi
         const QString SUBSTR_DELIMITER = ", ";                          //!< parameter delimiter in signal
+        const QString NA_STR = "N/A";                                   //!< not available
 
         static const int TIMER_PER_MS = 1000;                           //!< timer period [ms]
 
@@ -79,6 +86,16 @@ class SignalGenerator : public QMainWindow
 
 
     private:
+        bool checkValidInteger
+            (
+            const int16_t aIntValue         //!< integer value
+            ) const;
+
+        bool checkValidReal
+            (
+            const double aRealValue         //!< real value
+            ) const;
+
         QString createSignalStringTriangle
             (
             const SignalItem::SignalTriangle    aSignal     //!< a Triangle signal
@@ -135,6 +152,8 @@ class SignalGenerator : public QMainWindow
             ) const;
 
 
+        void createSmcSignal();
+
         void createTabSignalsMap();
 
         void fillValuesTriangle();
@@ -148,20 +167,26 @@ class SignalGenerator : public QMainWindow
         void fillValuesSinDampSin();
         void fillValuesTrapDampSin();
         void fillValuesNoise();
+        void fillValuesSmc();
 
         bool initializeAudio
             (
-            const QAudioDeviceInfo&     aDeviceInfo     //!< audio device
+            const QAudioDevice&     aDeviceInfo     //!< audio device
             );
 
         void setAudioData();
+
+        void trim
+            (
+            std::string&    aString         //!< string to trim
+            );
 
         void updateControls();
 
     private slots:
         void handleAudioBufferLengthChanged
             (
-            int aValue      //!< value
+            double aValue   //!< value
             );
 
         void handleAbout();
@@ -282,12 +307,16 @@ class SignalGenerator : public QMainWindow
 
         void handleSignalTypeChanged();
 
+        void handleSmcOpen();
+
         void handleVolumeChanged
             (
             int     aValue      //!< index
             );
 
         void updateAudioBufferTimer();
+
+        void updateAudioDevices();
 
 
     //************************************************************************
@@ -303,6 +332,7 @@ class SignalGenerator : public QMainWindow
         bool                            mSignalReady;           //!< true if a signal is ready
         bool                            mSignalStarted;         //!< true if a signal is currently generated
         bool                            mSignalPaused;          //!< true if a signal is currently paused
+        bool                            mSignalIsSmc;           //!< true if the signal is SMC data
 
         int                             mCurrentSignalType;     //!< current signal type
 
@@ -326,13 +356,17 @@ class SignalGenerator : public QMainWindow
         SignalItem*                     mEditedSignal;          //!< signal which is edited
         bool                            mIsSignalEdited;        //!< if a signal is edited
 
+        QMediaDevices*                  mDevices;               //!< media devices
         QScopedPointer<AudioSource>     mAudioSrc;              //!< audio source
-        QScopedPointer<QAudioOutput>    mAudioOutput;           //!< audio output        
-        uint32_t                        mAudioBufferLength;     //!< audio buffer length
+        QScopedPointer<QAudioSink>      mAudioOutput;           //!< audio output
+        double                          mAudioBufferLength;     //!< audio buffer length [s]
 
         int                             mAudioBufferProgress;   //!< percentage progress in audio buffer
         QTimer*                         mAudioBufferTimer;      //!< timer for progress in audio buffer
         uint64_t                        mAudioBufferCounter;    //!< counter for the audio buffer
+
+        Smc                             mSmc;                   //!< SMC (Strong-Motion CD) data object
+        std::string                     mSmcInputFilename;      //!< SMC file name
 };
 
 #endif // SignalGenerator_h

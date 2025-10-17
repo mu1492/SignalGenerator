@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2023 Mihai Ursu                                                 //
+// Copyright (C) 2023,2025 Mihai Ursu                                            //
 //                                                                               //
 // This program is free software; you can redistribute it and/or modify          //
 // it under the terms of the GNU General Public License as published by          //
@@ -23,6 +23,7 @@ This file contains the definitions for the audio source.
 #ifndef AudioSource_h
 #define AudioSource_h
 
+#include <QAudioFormat>
 #include <QAudioOutput>
 #include <QByteArray>
 #include <QIODevice>
@@ -61,7 +62,7 @@ class AudioSource : public QIODevice
 
         void setBufferLength
             (
-            const uint32_t aLength          //!< a length in seconds
+            const double aLength            //!< a length in seconds
             );
 
         void setData
@@ -166,6 +167,12 @@ class AudioSource : public QIODevice
             const double                        aTime           //!< time
             ) const;
 
+        double getSignalValueSmc
+            (
+            const SignalItem::SignalSmc         aSignalData,    //!< SMC signal data
+            const double                        aTime           //!< time
+            ) const;
+
 
         void pseudoDes
             (
@@ -179,7 +186,7 @@ class AudioSource : public QIODevice
     //************************************************************************
     private:
         QAudioFormat                mAudioFormat;               //!< audio format
-        uint32_t                    mAudioBufferLengthSeconds;  //!< length of audio buffer [seconds]
+        double                      mAudioBufferLengthSeconds;  //!< length of audio buffer [seconds]
         qint64                      mBufferPos;                 //!< current position in data buffer
         QByteArray                  mAudioBuffer;               //!< audio data buffer
         std::vector<SignalItem*>    mSignalsVector;             //!< signals vector

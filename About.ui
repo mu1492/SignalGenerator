@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>324</width>
-    <height>166</height>
+    <width>412</width>
+    <height>273</height>
    </rect>
   </property>
   <property name="font">
@@ -21,8 +21,8 @@
   <widget class="QPushButton" name="OkButton">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>110</y>
+     <x>160</x>
+     <y>220</y>
      <width>91</width>
      <height>24</height>
     </rect>
@@ -34,33 +34,55 @@
   <widget class="QLabel" name="TitleLabel">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>140</x>
      <y>30</y>
      <width>131</width>
-     <height>31</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
     <string>Signal Generator</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="CopyrightLabel">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>60</y>
-     <width>131</width>
-     <height>31</height>
+     <x>110</x>
+     <y>50</y>
+     <width>191</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>(c) 2023, Mihai Ursu</string>
+    <string>(c) 2023,2025, Mihai Ursu</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="SmcLabel">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>90</y>
+     <width>311</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;The &lt;a href=&quot;https://escweb.wr.usgs.gov/nsmp-data/&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline; color:#0000ff;&quot;&gt;S&lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://escweb.wr.usgs.gov/nsmp-data/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;trong &lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://escweb.wr.usgs.gov/nsmp-data/&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline; color:#0000ff;&quot;&gt;M&lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://escweb.wr.usgs.gov/nsmp-data/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;otion &lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://escweb.wr.usgs.gov/nsmp-data/&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline; color:#0000ff;&quot;&gt;C&lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://escweb.wr.usgs.gov/nsmp-data/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;D&lt;/span&gt;&lt;/a&gt; (SMC) format is used &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;by the &lt;a href=&quot;https://earthquake.usgs.gov/monitoring/nsmp/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;National Strong Motion Project&lt;/span&gt;&lt;/a&gt; (NSMP) &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;at the &lt;a href=&quot;https://www.usgs.gov/programs/earthquake-hazards&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;US Geological Survey&lt;/span&gt;&lt;/a&gt; (USGS).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::TextFormat::RichText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
